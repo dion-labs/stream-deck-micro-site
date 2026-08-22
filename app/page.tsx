@@ -26,7 +26,12 @@ export default function Home() {
   const active = keys[selected];
 
   const copyInstall = async () => {
-    await navigator.clipboard.writeText('npm install --global stream-deck-micro');
+    await navigator.clipboard.writeText([
+      'git clone https://github.com/dion-labs/stream-deck-micro.git',
+      'cd stream-deck-micro && npm ci',
+      'npm run build && npm link',
+      'stream-deck-micro doctor && stream-deck-micro start',
+    ].join('\n'));
     setCopied(true);
     window.setTimeout(() => setCopied(false), 1800);
   };
@@ -255,7 +260,7 @@ export default function Home() {
         <div className="section-index">04 / Get started</div>
         <div className="install-grid">
           <div className="install-copy">
-            <p className="section-kicker">Three commands.<br />One less dashboard.</p>
+            <p className="section-kicker">Clone. Build. Go.<br />One less dashboard.</p>
             <h2>Make it<br /><em>yours.</em></h2>
             <p>Built for macOS, Node.js 22+, Codex CLI, and the 15-key Stream Deck MK.2.</p>
             <a href="https://github.com/dion-labs/stream-deck-micro#install">Read the full setup guide <span>↗</span></a>
@@ -263,12 +268,13 @@ export default function Home() {
           <div className="terminal" aria-label="Installation commands">
             <div className="terminal-bar"><span><i /><i /><i /></span><b>TERMINAL · ZSH</b><span>LOCAL</span></div>
             <div className="terminal-code">
-              <p><span>01</span><code><b>$</b> npm install --global stream-deck-micro</code></p>
-              <p><span>02</span><code><b>$</b> stream-deck-micro doctor</code></p>
-              <p><span>03</span><code><b>$</b> stream-deck-micro start</code></p>
+              <p><span>01</span><code><b>$</b> git clone https://github.com/dion-labs/stream-deck-micro.git</code></p>
+              <p><span>02</span><code><b>$</b> cd stream-deck-micro &amp;&amp; npm ci</code></p>
+              <p><span>03</span><code><b>$</b> npm run build &amp;&amp; npm link</code></p>
+              <p><span>04</span><code><b>$</b> stream-deck-micro doctor &amp;&amp; stream-deck-micro start</code></p>
               <p className="terminal-result"><span>✓</span><code>Control Room ready at 127.0.0.1:17531</code></p>
             </div>
-            <button onClick={copyInstall} type="button">{copied ? 'Copied' : 'Copy install command'}</button>
+            <button onClick={copyInstall} type="button">{copied ? 'Copied' : 'Copy install commands'}</button>
           </div>
         </div>
         <p className="power-note"><strong>Power-user default:</strong> the example config runs Codex with full access and no approvals. Review every workflow prompt and choose a narrower sandbox if that does not match your threat model.</p>
