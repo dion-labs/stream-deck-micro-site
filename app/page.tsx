@@ -2,36 +2,96 @@
 
 import { useState } from 'react';
 
+declare global {
+  interface Window {
+    zaraz?: {
+      track: (eventName: string, properties?: Record<string, string>) => Promise<void> | void;
+    };
+  }
+}
+
 const keys = [
   { label: '01', name: 'Forge', state: 'working', tone: 'lime' },
   { label: '02', name: 'Atlas', state: 'ready', tone: 'blue' },
-  { label: '03', name: 'Scout', state: 'waiting', tone: 'amber' },
-  { label: '04', name: 'Mender', state: 'done', tone: 'mint' },
+  { label: '03', name: 'Scout', state: 'thinking', tone: 'violet' },
+  { label: '04', name: 'Mender', state: 'attention', tone: 'mint' },
   { label: '05', name: 'Pixel', state: 'idle', tone: 'violet' },
   { label: '06', name: 'Pilot', state: 'idle', tone: 'rose' },
-  { label: 'DO', name: 'Do it', state: 'send', tone: 'action' },
+  { label: 'STATUS', name: 'Status', state: 'prompt', tone: 'neutral' },
   { label: 'STOP', name: 'Stop', state: 'halt', tone: 'danger' },
   { label: 'ATTACH', name: 'Attach', state: 'context', tone: 'neutral' },
+  { label: 'TESTS', name: 'Tests', state: 'prompt', tone: 'neutral' },
   { label: 'REVIEW', name: 'Review', state: 'prompt', tone: 'neutral' },
   { label: 'DEBUG', name: 'Debug', state: 'prompt', tone: 'neutral' },
   { label: 'REFACTOR', name: 'Refactor', state: 'prompt', tone: 'neutral' },
-  { label: 'TESTS', name: 'Tests', state: 'prompt', tone: 'neutral' },
-  { label: 'SEL', name: 'Selection', state: 'scope', tone: 'neutral' },
-  { label: 'MICRO', name: 'Control', state: 'local', tone: 'brand' },
+  { label: 'SLEEP', name: 'Sleep', state: 'now', tone: 'neutral' },
+  { label: 'DO IT', name: 'Do it', state: 'send', tone: 'action' },
 ];
+
+const roomActions = ['STATUS', 'STOP', 'ATTACH', 'TESTS', 'REVIEW', 'DEBUG', 'REFACTOR', 'SLEEP', 'DO IT'];
+
+function track(eventName: string, properties?: Record<string, string>) {
+  void window.zaraz?.track(eventName, properties);
+}
 
 export default function Home() {
   const [selected, setSelected] = useState(0);
   const [copied, setCopied] = useState(false);
-  const active = keys[selected];
+  const [deckMode, setDeckMode] = useState<'awake' | 'asleep'>('awake');
+  const [attentionOpen, setAttentionOpen] = useState(true);
+  const [deckMessage, setDeckMessage] = useState('Mender completed · acknowledgement required');
+  const [roomTab, setRoomTab] = useState<'slots' | 'device'>('slots');
+  const displayKeys = keys.map((key, index) => index === 3
+    ? { ...key, state: attentionOpen ? 'attention' : 'ready', tone: attentionOpen ? 'mint' : 'neutral' }
+    : key);
+  const active = displayKeys[selected];
+
+  const pressKey = (index: number) => {
+    if (deckMode === 'asleep') {
+      setDeckMode('awake');
+      setDeckMessage('Wake received · press again to run the action');
+      track('deck_demo_wake', { source: 'key' });
+      return;
+    }
+    setSelected(index);
+    if (index === 13) {
+      setDeckMode('asleep');
+      setDeckMessage('Deck asleep · any key wakes without executing');
+      track('deck_demo_sleep');
+      return;
+    }
+    if (index === 3 && attentionOpen) {
+      setAttentionOpen(false);
+      setDeckMessage('Mender acknowledged · ready to sleep when quiet');
+      track('deck_demo_acknowledge');
+      return;
+    }
+    if (index === 14) {
+      setDeckMessage('“lets do it” sent to the selected Codex task');
+      track('deck_demo_prompt', { workflow: 'do-it' });
+      return;
+    }
+    setDeckMessage(`${displayKeys[index].name} · ${displayKeys[index].state}`);
+  };
+
+  const simulateStatusUpdate = () => {
+    setDeckMode('awake');
+    setAttentionOpen(true);
+    setSelected(3);
+    setDeckMessage('Status changed · deck woke · Mender needs attention');
+    track('deck_demo_status_update');
+  };
 
   const copyInstall = async () => {
     await navigator.clipboard.writeText([
       'git clone https://github.com/dion-labs/stream-deck-micro.git',
       'cd stream-deck-micro && npm ci',
       'npm run build && npm link',
+      'stream-deck-micro shared install',
+      '# Fully quit and reopen Codex Desktop once',
       'stream-deck-micro doctor && stream-deck-micro start',
     ].join('\n'));
+    track('install_commands_copy');
     setCopied(true);
     window.setTimeout(() => setCopied(false), 1800);
   };
@@ -47,7 +107,7 @@ export default function Home() {
           <a href="#experience">Experience</a>
           <a href="#control-room">Control Room</a>
           <a href="#install">Install</a>
-          <a href="https://github.com/dion-labs/stream-deck-micro">GitHub</a>
+          <a href="https://github.com/dion-labs/stream-deck-micro" onClick={() => track('cta_click', { target: 'github_nav' })}>GitHub</a>
         </div>
       </nav>
 
@@ -60,7 +120,7 @@ export default function Home() {
             for Codex. See every session. Act without breaking focus.
           </p>
           <div className="hero-actions">
-            <a className="button button-primary" href="https://github.com/dion-labs/stream-deck-micro">
+            <a className="button button-primary" href="https://github.com/dion-labs/stream-deck-micro" onClick={() => track('cta_click', { target: 'github_hero' })}>
               View on GitHub <span aria-hidden="true">↗</span>
             </a>
             <a className="button button-secondary" href="#install">Install locally</a>
@@ -77,17 +137,17 @@ export default function Home() {
           <div className="glow glow-one" />
           <div className="glow glow-two" />
           <div className="deck-shadow" />
-          <div className="deck-shell">
+          <div className={`deck-shell ${deckMode === 'asleep' ? 'is-asleep' : ''}`}>
             <div className="deck-topline">
               <span>CODEX / LIVE</span>
-              <span className="deck-status"><i /> 6 sessions</span>
+              <span className="deck-status"><i /> {deckMode === 'asleep' ? 'sleeping' : '6 sessions'}</span>
             </div>
             <div className="key-grid">
-              {keys.map((key, index) => (
+              {displayKeys.map((key, index) => (
                 <button
-                  className={`deck-key key-${key.tone} ${selected === index ? 'is-selected' : ''}`}
+                  className={`deck-key key-${key.tone} ${selected === index ? 'is-selected' : ''} ${index === 3 && attentionOpen ? 'is-attention' : ''}`}
                   key={`${key.label}-${key.name}`}
-                  onClick={() => setSelected(index)}
+                  onClick={() => pressKey(index)}
                   type="button"
                   aria-pressed={selected === index}
                   aria-label={`${key.name}: ${key.state}`}
@@ -104,7 +164,10 @@ export default function Home() {
               <span>LOCAL / 127.0.0.1</span>
             </div>
           </div>
-          <p className="interaction-hint">Press a key to inspect its state</p>
+          <div className="demo-controls">
+            <p className="interaction-hint" aria-live="polite">{deckMessage}</p>
+            <button type="button" onClick={simulateStatusUpdate}>Simulate status update</button>
+          </div>
         </div>
       </section>
 
@@ -123,9 +186,9 @@ export default function Home() {
           <p className="section-kicker">Leave the agents running.<br />Keep your head in the work.</p>
           <h2>Less window hunting.<br /><em>More knowing.</em></h2>
           <p>
-            Six agent keys mirror the sessions already running in Codex. Color,
-            pulse, and a few deliberate actions tell you what needs attention—
-            before another app can pull you out of flow.
+            Six agent keys mirror the tasks already open in Codex Desktop. Color,
+            pulse, wake-on-change, and a few deliberate actions tell you what needs
+            attention—before another app can pull you out of flow.
           </p>
         </div>
       </section>
@@ -140,18 +203,18 @@ export default function Home() {
           </div>
           <div>
             <h3>See</h3>
-            <p>Read idle, thinking, working, complete, and error states at a glance.</p>
+            <p>Read idle, thinking, working, and persistent attention states at a glance.</p>
           </div>
         </article>
 
         <article className="capability capability-act">
           <div className="capability-number">02</div>
           <div className="action-orbit" aria-hidden="true">
-            <span>DO IT</span><span>STOP</span><span>ATTACH</span>
+            <span>DO IT</span><span>STOP</span><span>SLEEP</span>
           </div>
           <div>
             <h3>Act</h3>
-            <p>Select, prompt, attach, or interrupt without reaching for another window.</p>
+            <p>Select, prompt, sleep, attach, or interrupt without reaching for another window.</p>
           </div>
         </article>
 
@@ -187,40 +250,51 @@ export default function Home() {
           <div className="window-body">
             <aside className="window-sidebar">
               <p>Control Room</p>
-              <button className="active" type="button"><span>⌗</span> Deck</button>
+              <button className={roomTab === 'slots' ? 'active' : ''} type="button" onClick={() => setRoomTab('slots')}><span>⌗</span> Slots</button>
               <button type="button"><span>◫</span> Sessions</button>
-              <button type="button"><span>↗</span> Workflows</button>
+              <button type="button"><span>↗</span> Keys</button>
+              <button className={roomTab === 'device' ? 'active' : ''} type="button" onClick={() => setRoomTab('device')}><span>◉</span> Device</button>
               <div className="sidebar-note"><i /> Local only<br /><span>Fresh token · secure origin</span></div>
             </aside>
             <div className="window-main">
               <header>
-                <div><span>PHYSICAL SURFACE</span><h3>Your agents, at a glance.</h3></div>
-                <button type="button">Refresh sessions</button>
+                <div><span>{roomTab === 'slots' ? 'PHYSICAL SURFACE' : 'DEVICE BEHAVIOR'}</span><h3>{roomTab === 'slots' ? 'Your agents, at a glance.' : 'Quiet when it can be. Awake when it matters.'}</h3></div>
+                <button type="button">{roomTab === 'slots' ? 'Refresh sessions' : 'Save settings'}</button>
               </header>
-              <div className="room-grid">
-                <div className="room-deck">
-                  {[0, 1, 2, 3, 4, 5].map((slot) => (
-                    <div className={`room-key room-key-${slot}`} key={slot}>
-                      <span>0{slot + 1}</span>
-                      <strong>{['Forge', 'Atlas', 'Scout', 'Mender', 'Pixel', 'Pilot'][slot]}</strong>
-                      <small>{['working', 'ready', 'waiting', 'done', 'idle', 'idle'][slot]}</small>
-                    </div>
-                  ))}
-                  {['DO IT', 'STOP', 'ATTACH', 'REVIEW', 'DEBUG', 'REFACTOR', 'TESTS', 'SEL', 'MICRO'].map((label) => (
-                    <div className="room-key room-key-action" key={label}><strong>{label}</strong></div>
-                  ))}
+              {roomTab === 'slots' ? (
+                <div className="room-grid">
+                  <div className="room-deck">
+                    {[0, 1, 2, 3, 4, 5].map((slot) => (
+                      <div className={`room-key room-key-${slot}`} key={slot}>
+                        <span>0{slot + 1}</span>
+                        <strong>{['Forge', 'Atlas', 'Scout', 'Mender', 'Pixel', 'Pilot'][slot]}</strong>
+                        <small>{['working', 'ready', 'thinking', 'attention', 'idle', 'idle'][slot]}</small>
+                      </div>
+                    ))}
+                    {roomActions.map((label) => (
+                      <div className={`room-key room-key-action ${label === 'SLEEP' ? 'room-key-sleep' : ''} ${label === 'DO IT' ? 'room-key-doit' : ''}`} key={label}><strong>{label}</strong></div>
+                    ))}
+                  </div>
+                  <aside className="inspector">
+                    <div className="inspector-title"><span className="active-ring">04</span><div><b>Mender</b><small>ATTENTION</small></div></div>
+                    <dl>
+                      <div><dt>Repository</dt><dd>stream-deck-micro</dd></div>
+                      <div><dt>Updated</dt><dd>Just now</dd></div>
+                      <div><dt>Session</dt><dd>019c…a71f</dd></div>
+                    </dl>
+                    <button type="button">Open and acknowledge</button>
+                    <button className="quiet" type="button">Remove from deck</button>
+                  </aside>
                 </div>
-                <aside className="inspector">
-                  <div className="inspector-title"><span className="active-ring">01</span><div><b>Forge</b><small>WORKING</small></div></div>
-                  <dl>
-                    <div><dt>Repository</dt><dd>stream-deck-micro</dd></div>
-                    <div><dt>Updated</dt><dd>Just now</dd></div>
-                    <div><dt>Session</dt><dd>019c…a71f</dd></div>
-                  </dl>
-                  <button type="button">Stop turn</button>
-                  <button className="quiet" type="button">Remove from deck</button>
-                </aside>
-              </div>
+              ) : (
+                <div className="device-panel">
+                  <div className="device-state-card"><i /><div><span>DECK MODE</span><strong>Awake</strong><small>Status changes reset the timer</small></div></div>
+                  <div className="device-setting device-setting-wide"><div><span>AWAKE BRIGHTNESS</span><strong>70%</strong></div><div className="device-range"><i /></div></div>
+                  <div className="device-setting"><span>AUTO SLEEP</span><strong>Enabled</strong><small>Stay awake while a task is active</small></div>
+                  <div className="device-setting"><span>IDLE TIMEOUT</span><strong>15 minutes</strong><small>Counted from the latest status update</small></div>
+                  <div className="device-setting device-setting-wide"><span>WHEN ATTENTION IS WAITING</span><strong>Keep only that task visible</strong><small>Press its slot to acknowledge; everything else can go dark.</small></div>
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -228,7 +302,7 @@ export default function Home() {
         <div className="control-caption shell">
           <p>A localhost workspace for everything that should not crowd the keys.</p>
           <div>
-            <span>Rename slots</span><span>Attach sessions</span><span>Edit workflows</span><span>Review activity</span>
+            <span>Rename slots</span><span>Attach sessions</span><span>Edit workflows</span><span>Tune sleep</span>
           </div>
         </div>
       </section>
@@ -240,17 +314,19 @@ export default function Home() {
             <p className="section-kicker">Your code. Your machine.<br />Your command center.</p>
             <h2>Local by<br /><em>design.</em></h2>
             <p>
-              Stream Deck Micro talks to the official Codex app-server and your
-              deck from one local daemon. The Control Room binds to loopback;
-              your session data is never hosted by Dion Labs.
+              Codex Desktop and Stream Deck Micro connect to one shared local
+              App Server, so either surface can continue the same task. The
+              Control Room and WebSocket endpoint bind to loopback; your session
+              data is never hosted by Dion Labs.
             </p>
           </div>
           <div className="architecture-map" aria-label="Local architecture diagram">
-            <div className="map-node map-codex"><span>01</span><strong>Codex</strong><small>app · CLI · IDE</small></div>
-            <div className="map-rail"><i /><b>LOCAL DAEMON</b><i /></div>
-            <div className="map-output">
-              <div className="map-node"><span>02</span><strong>Stream Deck</strong><small>USB / HID</small></div>
-              <div className="map-node"><span>03</span><strong>Control Room</strong><small>127.0.0.1</small></div>
+            <div className="map-node map-codex"><span>01</span><strong>Codex tasks</strong><small>shared session history</small></div>
+            <div className="map-rail"><i /><b>WS://127.0.0.1:17532</b><i /></div>
+            <div className="map-output map-output-three">
+              <div className="map-node"><span>02</span><strong>Codex Desktop</strong><small>read · write</small></div>
+              <div className="map-node"><span>03</span><strong>Stream Deck</strong><small>USB / HID</small></div>
+              <div className="map-node"><span>04</span><strong>Control Room</strong><small>127.0.0.1</small></div>
             </div>
           </div>
         </div>
@@ -262,8 +338,8 @@ export default function Home() {
           <div className="install-copy">
             <p className="section-kicker">Clone. Build. Go.<br />One less dashboard.</p>
             <h2>Make it<br /><em>yours.</em></h2>
-            <p>Built for macOS, Node.js 22+, Codex CLI, and the 15-key Stream Deck MK.2.</p>
-            <a href="https://github.com/dion-labs/stream-deck-micro#install">Read the full setup guide <span>↗</span></a>
+            <p>Built for macOS, Node.js 22+, Codex Desktop, and the 15-key Stream Deck MK.2.</p>
+            <a href="https://github.com/dion-labs/stream-deck-micro#install" onClick={() => track('cta_click', { target: 'install_guide' })}>Read the full setup guide <span>↗</span></a>
           </div>
           <div className="terminal" aria-label="Installation commands">
             <div className="terminal-bar"><span><i /><i /><i /></span><b>TERMINAL · ZSH</b><span>LOCAL</span></div>
@@ -271,7 +347,9 @@ export default function Home() {
               <p><span>01</span><code><b>$</b> git clone https://github.com/dion-labs/stream-deck-micro.git</code></p>
               <p><span>02</span><code><b>$</b> cd stream-deck-micro &amp;&amp; npm ci</code></p>
               <p><span>03</span><code><b>$</b> npm run build &amp;&amp; npm link</code></p>
-              <p><span>04</span><code><b>$</b> stream-deck-micro doctor &amp;&amp; stream-deck-micro start</code></p>
+              <p><span>04</span><code><b>$</b> stream-deck-micro shared install</code></p>
+              <p><span>05</span><code><b>#</b> quit + reopen Codex Desktop once</code></p>
+              <p><span>06</span><code><b>$</b> stream-deck-micro doctor &amp;&amp; stream-deck-micro start</code></p>
               <p className="terminal-result"><span>✓</span><code>Control Room ready at 127.0.0.1:17531</code></p>
             </div>
             <button onClick={copyInstall} type="button">{copied ? 'Copied' : 'Copy install commands'}</button>
@@ -285,8 +363,8 @@ export default function Home() {
         <h2>Give your agents<br />a place to <em>land.</em></h2>
         <p>Fork it. Shape it. Put your best workflows under your fingertips.</p>
         <div className="hero-actions">
-          <a className="button button-primary" href="https://github.com/dion-labs/stream-deck-micro">Explore the repository <span>↗</span></a>
-          <a className="button button-secondary" href="https://github.com/sponsors/dion-labs">Sponsor Dion Labs <span>♡</span></a>
+          <a className="button button-primary" href="https://github.com/dion-labs/stream-deck-micro" onClick={() => track('cta_click', { target: 'github_closing' })}>Explore the repository <span>↗</span></a>
+          <a className="button button-secondary" href="https://github.com/sponsors/dion-labs" onClick={() => track('cta_click', { target: 'sponsor' })}>Sponsor Dion Labs <span>♡</span></a>
         </div>
       </section>
 
