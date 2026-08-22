@@ -440,7 +440,7 @@ export default function Home() {
       <footer className="footer shell">
         <a className="brand" href="#top"><span className="brand-mark">DM</span><span>Stream Deck Micro</span></a>
         <p>An independent, unofficial interoperability project by <a href="https://dionlabs.ai">Dion Labs</a>.</p>
-        <div><a href="https://github.com/dion-labs/stream-deck-micro">GitHub</a><a href="https://github.com/sponsors/dion-labs">Sponsor</a><a href="#top">Back to top ↑</a></div>
+        <div><a href="https://github.com/dion-labs/stream-deck-micro">GitHub</a><a href="/privacy/">Privacy</a><a href="https://github.com/sponsors/dion-labs">Sponsor</a><a href="#top">Back to top ↑</a></div>
         <small>Not affiliated with or endorsed by OpenAI, Work Louder, or Elgato. Codex, Codex Micro, and Stream Deck are marks of their respective owners.</small>
       </footer>
     </main>
