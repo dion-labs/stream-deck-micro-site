@@ -30,6 +30,25 @@ const keys = [
 
 const roomActions = ['STATUS', 'STOP', 'ATTACH', 'TESTS', 'REVIEW', 'DEBUG', 'REFACTOR', 'SLEEP', 'DO IT'];
 
+const installCommands = {
+  marketplace: [
+    'git clone https://github.com/dion-labs/stream-deck-micro.git',
+    'cd stream-deck-micro && npm ci && npm run build && npm link',
+    'npm run marketplace:install && npm run marketplace:build',
+    'npm --prefix marketplace run link',
+    'stream-deck-micro marketplace install',
+    '# Import the bundled profile; keep the Elgato app running',
+  ],
+  independent: [
+    'git clone https://github.com/dion-labs/stream-deck-micro.git',
+    'cd stream-deck-micro && npm ci',
+    'npm run build && npm link',
+    'stream-deck-micro shared install',
+    '# Fully quit Elgato + restart Codex Desktop once',
+    'stream-deck-micro doctor && stream-deck-micro start',
+  ],
+};
+
 function track(eventName: string, properties?: Record<string, string>) {
   void window.zaraz?.track(eventName, properties);
 }
@@ -41,6 +60,7 @@ export default function Home() {
   const [attentionOpen, setAttentionOpen] = useState(true);
   const [deckMessage, setDeckMessage] = useState('Mender completed · acknowledgement required');
   const [roomTab, setRoomTab] = useState<'slots' | 'device'>('slots');
+  const [edition, setEdition] = useState<'marketplace' | 'independent'>('marketplace');
   const displayKeys = keys.map((key, index) => index === 3
     ? { ...key, state: attentionOpen ? 'attention' : 'ready', tone: attentionOpen ? 'mint' : 'neutral' }
     : key);
@@ -83,15 +103,8 @@ export default function Home() {
   };
 
   const copyInstall = async () => {
-    await navigator.clipboard.writeText([
-      'git clone https://github.com/dion-labs/stream-deck-micro.git',
-      'cd stream-deck-micro && npm ci',
-      'npm run build && npm link',
-      'stream-deck-micro shared install',
-      '# Fully quit and reopen Codex Desktop once',
-      'stream-deck-micro doctor && stream-deck-micro start',
-    ].join('\n'));
-    track('install_commands_copy');
+    await navigator.clipboard.writeText(installCommands[edition].join('\n'));
+    track('install_commands_copy', { edition });
     setCopied(true);
     window.setTimeout(() => setCopied(false), 1800);
   };
@@ -105,6 +118,7 @@ export default function Home() {
         </a>
         <div className="nav-links">
           <a href="#experience">Experience</a>
+          <a href="#editions">Editions</a>
           <a href="#control-room">Control Room</a>
           <a href="#install">Install</a>
           <a href="https://github.com/dion-labs/stream-deck-micro" onClick={() => track('cta_click', { target: 'github_nav' })}>GitHub</a>
@@ -113,7 +127,7 @@ export default function Home() {
 
       <section className="hero shell" id="top">
         <div className="hero-copy">
-          <p className="eyebrow"><span /> Open source · Local first</p>
+          <p className="eyebrow"><span /> Open source · Two editions · Local first</p>
           <h1>Your agents.<br /><em>One deck.</em></h1>
           <p className="lede">
             Turn the Stream Deck you already own into a tactile command center
@@ -123,7 +137,7 @@ export default function Home() {
             <a className="button button-primary" href="https://github.com/dion-labs/stream-deck-micro" onClick={() => track('cta_click', { target: 'github_hero' })}>
               View on GitHub <span aria-hidden="true">↗</span>
             </a>
-            <a className="button button-secondary" href="#install">Install locally</a>
+            <a className="button button-secondary" href="#editions">Choose your edition</a>
           </div>
           <div className="signal-line" aria-live="polite">
             <span className={`signal-dot ${active.tone}`} />
@@ -232,9 +246,57 @@ export default function Home() {
         </article>
       </section>
 
+      <section className="editions shell" id="editions">
+        <div className="section-index">02 / Choose your surface</div>
+        <div className="editions-heading">
+          <div>
+            <p className="section-kicker">Same sessions. Same actions.<br />Your comfort level.</p>
+            <h2>Official app or<br /><em>direct control.</em></h2>
+          </div>
+          <p>
+            Both editions share one local bridge and behavior model. Pick the
+            familiar Elgato workflow or own the hardware directly—without giving
+            up prompts, attention, wake-on-change, or the Control Room.
+          </p>
+        </div>
+        <div className="edition-grid">
+          <article className="edition-card edition-marketplace">
+            <div className="edition-topline"><span>MARKETPLACE</span><b>Official SDK</b></div>
+            <div className="edition-symbol" aria-hidden="true"><i /><i /><i /><i /><i /><i /><i /><i /><i /></div>
+            <h3>Stay inside Elgato.</h3>
+            <p>An editable, auto-installed profile with native plugin lifecycle and a background local bridge.</p>
+            <ul>
+              <li>Elgato app stays open</li>
+              <li>Full session and workflow parity</li>
+              <li>Black-key simulated sleep</li>
+            </ul>
+            <button type="button" onClick={() => { setEdition('marketplace'); track('edition_select', { edition: 'marketplace' }); document.querySelector('#install')?.scrollIntoView(); }}>
+              Choose Marketplace <span>→</span>
+            </button>
+            <small>Built and validator-clean · Maker review next</small>
+          </article>
+          <article className="edition-card edition-independent">
+            <div className="edition-topline"><span>INDEPENDENT</span><b>Direct HID</b></div>
+            <div className="edition-signal" aria-hidden="true"><span>USB</span><i /><b>HID</b></div>
+            <h3>Own the whole path.</h3>
+            <p>A minimal standalone runtime that talks to your 15-key MK.2 without the Elgato app.</p>
+            <ul>
+              <li>Elgato app stays quit</li>
+              <li>Full session and workflow parity</li>
+              <li>True brightness-zero sleep</li>
+            </ul>
+            <button type="button" onClick={() => { setEdition('independent'); track('edition_select', { edition: 'independent' }); document.querySelector('#install')?.scrollIntoView(); }}>
+              Choose Independent <span>→</span>
+            </button>
+            <small>Available from source today</small>
+          </article>
+        </div>
+        <p className="edition-truth"><strong>The honest difference:</strong> Elgato's plugin API does not expose global device brightness. Marketplace sleep renders our keys pure black; Independent sleep turns the hardware brightness to zero.</p>
+      </section>
+
       <section className="control-section" id="control-room">
         <div className="control-heading shell">
-          <div className="section-index">02 / The Control Room</div>
+          <div className="section-index">03 / The Control Room</div>
           <div>
             <p className="section-kicker">The deck stays simple.<br />The details live here.</p>
             <h2>Shape the surface.<br /><em>Stay in control.</em></h2>
@@ -308,7 +370,7 @@ export default function Home() {
       </section>
 
       <section className="architecture shell">
-        <div className="section-index">03 / Under the surface</div>
+        <div className="section-index">04 / Under the surface</div>
         <div className="architecture-grid">
           <div className="architecture-copy">
             <p className="section-kicker">Your code. Your machine.<br />Your command center.</p>
@@ -325,7 +387,7 @@ export default function Home() {
             <div className="map-rail"><i /><b>WS://127.0.0.1:17532</b><i /></div>
             <div className="map-output map-output-three">
               <div className="map-node"><span>02</span><strong>Codex Desktop</strong><small>read · write</small></div>
-              <div className="map-node"><span>03</span><strong>Stream Deck</strong><small>USB / HID</small></div>
+              <div className="map-node"><span>03</span><strong>Stream Deck</strong><small>Elgato SDK / HID</small></div>
               <div className="map-node"><span>04</span><strong>Control Room</strong><small>127.0.0.1</small></div>
             </div>
           </div>
@@ -333,24 +395,31 @@ export default function Home() {
       </section>
 
       <section className="install-section shell" id="install">
-        <div className="section-index">04 / Get started</div>
+        <div className="section-index">05 / Get started</div>
         <div className="install-grid">
           <div className="install-copy">
-            <p className="section-kicker">Clone. Build. Go.<br />One less dashboard.</p>
+            <p className="section-kicker">
+              {edition === 'marketplace' ? <>Plugin. Profile. Go.<br />The familiar route.</> : <>Clone. Build. Go.<br />Own the whole path.</>}
+            </p>
             <h2>Make it<br /><em>yours.</em></h2>
-            <p>Built for macOS, Node.js 22+, Codex Desktop, and the 15-key Stream Deck MK.2.</p>
+            <p>
+              {edition === 'marketplace'
+                ? 'Run inside Elgato Stream Deck 7.1+ with an editable 5×3 profile and a persistent local bridge.'
+                : 'Run directly on macOS with Node.js 22+, Codex Desktop, and the 15-key Stream Deck MK.2.'}
+            </p>
+            <div className="edition-toggle" aria-label="Installation edition">
+              <button className={edition === 'marketplace' ? 'active' : ''} type="button" onClick={() => { setEdition('marketplace'); track('edition_select', { edition: 'marketplace', source: 'install' }); }}>Marketplace</button>
+              <button className={edition === 'independent' ? 'active' : ''} type="button" onClick={() => { setEdition('independent'); track('edition_select', { edition: 'independent', source: 'install' }); }}>Independent</button>
+            </div>
             <a href="https://github.com/dion-labs/stream-deck-micro#install" onClick={() => track('cta_click', { target: 'install_guide' })}>Read the full setup guide <span>↗</span></a>
           </div>
           <div className="terminal" aria-label="Installation commands">
-            <div className="terminal-bar"><span><i /><i /><i /></span><b>TERMINAL · ZSH</b><span>LOCAL</span></div>
+            <div className="terminal-bar"><span><i /><i /><i /></span><b>TERMINAL · ZSH</b><span>{edition.toUpperCase()}</span></div>
             <div className="terminal-code">
-              <p><span>01</span><code><b>$</b> git clone https://github.com/dion-labs/stream-deck-micro.git</code></p>
-              <p><span>02</span><code><b>$</b> cd stream-deck-micro &amp;&amp; npm ci</code></p>
-              <p><span>03</span><code><b>$</b> npm run build &amp;&amp; npm link</code></p>
-              <p><span>04</span><code><b>$</b> stream-deck-micro shared install</code></p>
-              <p><span>05</span><code><b>#</b> quit + reopen Codex Desktop once</code></p>
-              <p><span>06</span><code><b>$</b> stream-deck-micro doctor &amp;&amp; stream-deck-micro start</code></p>
-              <p className="terminal-result"><span>✓</span><code>Control Room ready at 127.0.0.1:17531</code></p>
+              {installCommands[edition].map((command, index) => (
+                <p key={command}><span>{String(index + 1).padStart(2, '0')}</span><code><b>{command.startsWith('#') ? '#' : '$'}</b> {command.replace(/^#\s*/, '')}</code></p>
+              ))}
+              <p className="terminal-result"><span>✓</span><code>{edition === 'marketplace' ? 'Marketplace bridge running in the background' : 'Control Room ready at 127.0.0.1:17531'}</code></p>
             </div>
             <button onClick={copyInstall} type="button">{copied ? 'Copied' : 'Copy install commands'}</button>
           </div>

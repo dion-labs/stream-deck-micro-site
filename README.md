@@ -2,7 +2,8 @@
 
 The public project site for [Stream Deck Micro](https://deck.dionlabs.ai), an
 open-source local command center for Codex sessions and the 15-key Elgato
-Stream Deck MK.2.
+Stream Deck MK.2. The site presents both the official-SDK Marketplace edition
+and the Independent direct-HID edition with their explicit feature differences.
 
 - [Live showcase](https://deck.dionlabs.ai)
 - [Application repository](https://github.com/dion-labs/stream-deck-micro)
@@ -44,6 +45,13 @@ The UI also emits optional Cloudflare Zaraz events when Zaraz is enabled:
 
 Without Zaraz these calls are inert. They do not add cookies or send data to a
 third-party analytics service from the application code.
+
+Metrics/Web Analytics needs no further setup after it is enabled; Cloudflare
+injects the beacon on the next production deployment. Zaraz is separate. To
+retain or forward the custom events, enable Zaraz and create triggers whose
+**Event Name** equals the event names above, then attach those triggers to an
+action in the analytics tool you choose. Use Zaraz Monitoring first to verify
+events and action outcomes before adding another analytics destination.
 
 ## License
 
