@@ -87,8 +87,9 @@ function PrivacyPolicy() {
                 The hosted setup preview contacts the Stream Deck Micro bridge on your Mac only
                 after you press <strong>Connect this Mac</strong>. The bridge returns a redacted
                 health summary directly to your browser; it does not send that response through
-                Dion Labs or Cloudflare. Website analytics may record that the setup button was
-                pressed, but not the bridge response or whether the connection succeeded.
+                Dion Labs or Cloudflare. Website analytics may record the edition selected,
+                installation-command copy action, or that the setup button was pressed, but not
+                the bridge response or whether the connection succeeded.
               </p>
             </section>
 
