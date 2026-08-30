@@ -120,6 +120,7 @@ export default function Home() {
           <a href="#experience">Experience</a>
           <a href="#editions">Editions</a>
           <a href="#control-room">Control Room</a>
+          <a href="/setup/">Setup</a>
           <a href="#install">Install</a>
           <a href="https://github.com/dion-labs/stream-deck-micro" onClick={() => track('cta_click', { target: 'github_nav' })}>GitHub</a>
         </div>

@@ -42,6 +42,16 @@ The UI also emits optional Cloudflare Zaraz events when Zaraz is enabled:
 - `install_commands_copy`;
 - `deck_demo_sleep`, `deck_demo_wake`, and `deck_demo_status_update`;
 - `deck_demo_acknowledge` and `deck_demo_prompt`.
+- `setup_connect` when a visitor explicitly starts the read-only local health check.
+
+## Hosted setup compatibility spike
+
+`/setup/` is the Phase 1A hosted Control Room spike. It performs no automatic
+probe: after an explicit click, the page requests a redacted health contract
+from `http://127.0.0.1:17531/api/hosted/health`. No prompts, task metadata,
+paths, configuration, or diagnostics are returned. If browser local-network
+policy blocks the request, the page keeps the existing localhost Control Room
+as the permanent fallback.
 
 Without Zaraz these calls are inert. They do not add cookies or send data to a
 third-party analytics service from the application code.

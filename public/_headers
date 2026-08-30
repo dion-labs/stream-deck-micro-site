@@ -1,0 +1,2 @@
+/setup/*
+  Permissions-Policy: loopback-network=(self), local-network=(self)
