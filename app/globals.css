@@ -668,7 +668,7 @@ h2 em {
 .text-trigger:hover { color: var(--acid); }
 .precision-stage { position: relative; padding: 72px 0 35px; perspective: 1400px; }
 .precision-stage::before { position: absolute; inset: 11% -10% 0; background: radial-gradient(ellipse at center, rgba(184,255,44,.11), transparent 62%); content: ''; filter: blur(15px); }
-.stage-spirit { position: absolute; z-index: 3; top: -25px; right: -25px; width: 205px; filter: drop-shadow(0 14px 30px rgba(184,255,44,.19)); animation: crewHover 5s ease-in-out infinite; }
+.stage-spirit { position: absolute; z-index: 3; top: -35px; right: -25px; width: 205px; filter: drop-shadow(0 14px 30px rgba(184,255,44,.19)); animation: crewHover 5s ease-in-out infinite; }
 .precision-device { position: relative; z-index: 2; width: 100%; min-width: 600px; padding: 34px 32px 28px; border: 1px solid #464c42; border-radius: 34px; background: linear-gradient(145deg, rgba(255,255,255,.075), transparent 21%), linear-gradient(165deg,#30342d,#1c201b 53%,#10120f); box-shadow: 0 50px 80px -42px #000, inset 0 1px rgba(255,255,255,.11), inset 0 -1px #050605; transform: rotateY(-4deg) rotateX(2deg); transform-origin: center; transition: filter .3s ease, transform .3s ease; }
 .precision-device::after { position: absolute; right: 12%; bottom: -13px; left: 12%; height: 13px; border: 1px solid #343a31; border-top: 0; border-radius: 0 0 9px 9px; background: #161916; content: ''; }
 .device-ridge, .device-foot { display: flex; align-items: center; color: #6f786a; font: 7px var(--font-geist-mono), monospace; letter-spacing: .1em; }
