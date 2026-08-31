@@ -125,7 +125,7 @@ export default function Home() {
     <main className="site-main">
       <nav className="nav shell" aria-label="Primary navigation">
         <a className="brand" href="#top" aria-label="Stream Deck Micro home">
-          <span className="brand-mark brand-spirit" aria-hidden="true"><img src="/crew/console-spirit.webp" alt="" /></span>
+          <span className="brand-mark brand-spirit" aria-hidden="true"><img src="/crew/curator-headshot.webp" alt="" /></span>
           <span>Stream Deck Micro</span>
         </a>
         <div className="nav-links">
@@ -224,7 +224,7 @@ export default function Home() {
 
       <section className="crew-closing shell"><img src="/crew/console-spirit.webp" alt="The Console Spirit" /><div><p className="eyebrow"><span /> MIT licensed · Built in the open</p><h2>Give your agents<br />a place to <em>land.</em></h2><p>Fork it. Shape it. Put your best workflows under your fingertips.</p><div className="hero-actions"><a className="button button-primary" href="https://github.com/dion-labs/stream-deck-micro" onClick={() => track('cta_click', { target: 'github_closing' })}>Explore the repository <span>↗</span></a><a className="button button-secondary" href="https://github.com/sponsors/dion-labs" onClick={() => track('cta_click', { target: 'sponsor' })}>Sponsor Dion Labs <span>♡</span></a></div></div></section>
 
-      <footer className="footer shell"><a className="brand" href="#top"><span className="brand-mark brand-spirit"><img src="/crew/console-spirit.webp" alt="" /></span><span>Stream Deck Micro</span></a><p>An independent, unofficial interoperability project by <a href="https://dionlabs.ai">Dion Labs</a>.</p><div><a href="https://github.com/dion-labs/stream-deck-micro">GitHub</a><a href="/privacy/">Privacy</a><a href="https://github.com/sponsors/dion-labs">Sponsor</a><a href="#top">Back to top ↑</a></div><small>Not affiliated with or endorsed by OpenAI or Elgato. Codex and Stream Deck are marks of their respective owners.</small></footer>
+      <footer className="footer shell"><a className="brand" href="#top"><span className="brand-mark brand-spirit"><img src="/crew/curator-headshot.webp" alt="" /></span><span>Stream Deck Micro</span></a><p>An independent, unofficial interoperability project by <a href="https://dionlabs.ai">Dion Labs</a>.</p><div><a href="https://github.com/dion-labs/stream-deck-micro">GitHub</a><a href="/privacy/">Privacy</a><a href="https://github.com/sponsors/dion-labs">Sponsor</a><a href="#top">Back to top ↑</a></div><small>Not affiliated with or endorsed by OpenAI or Elgato. Codex and Stream Deck are marks of their respective owners.</small></footer>
     </main>
   );
 }
