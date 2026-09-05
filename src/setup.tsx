@@ -456,7 +456,7 @@ function Setup() {
                 {componentOrder.map((name) => {
                   const component = health.health.components[name];
                   if (!component) return null;
-                  const guidance = route === 'native' && name === 'sharedControl' && component.state !== 'ready' ? 'Open Codex + Stream Deck and follow its connection status. An already-running private Codex session stays untouched; quit it when convenient, then open the launcher.' : recoveryCopy(name, component, installedEdition!);
+                  const guidance = route === 'native' && (name === 'sharedControl' || name === 'codexDesktop') && component.state !== 'ready' && component.state !== 'not-required' ? 'Open Codex + Stream Deck and follow its connection status. An already-running private Codex session stays untouched; quit it when convenient, then open the launcher.' : recoveryCopy(name, component, installedEdition!);
                   return (
                     <article className={`health-card health-${component.state} ${guidance ? 'has-guidance' : ''}`} key={name}>
                       <div><i /><span>{componentLabels[name]}</span>{component.version && <code>v{component.version}</code>}</div>
@@ -474,7 +474,7 @@ function Setup() {
                   <strong>{editionMismatch ? 'Align the selected and running editions.' : health.health.components.bindings?.state === 'action-required' ? 'Assign your first session button.' : health.capabilities.mode === 'navigation-only' ? 'Open the Control Room—or review optional live control.' : 'Your local control path is ready.'}</strong>
                 </div>
                 <div className="setup-actions">
-                  {editionMismatch && <button className="setup-secondary" type="button" onClick={() => { setEdition(installedEdition!); setStep(1); }}>Use detected edition</button>}
+                  {editionMismatch && <button className="setup-secondary" type="button" onClick={() => { setEdition(installedEdition!); if (installedEdition === 'independent') setRoute('source'); setStep(1); }}>Use detected edition</button>}
                   <button className="setup-secondary" type="button" onClick={connect}>Check again</button>
                   <a className="setup-primary" href={BRIDGE_ORIGIN}>Open local Control Room <span>↗</span></a>
                 </div>
