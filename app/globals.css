@@ -694,8 +694,9 @@ h2 em {
 .crew-heading, .control-intro, .editions-v3-heading { display: grid; grid-template-columns: 1.1fr .9fr; gap: 80px; align-items: end; }
 .crew-heading > p, .control-intro > p, .editions-v3-heading > p { max-width: 500px; margin: 0 0 8px; color: #8a9485; font-size: 14px; line-height: 1.75; }
 .crew-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; margin-top: 70px; }
-.crew-card { position: relative; min-height: 590px; overflow: hidden; border: 1px solid #293026; border-radius: 17px; background: linear-gradient(155deg,rgba(184,255,44,.035),transparent 40%),#0b0e0b; }
-.crew-card::after { position: absolute; inset: 0; background: linear-gradient(0deg,#090b09 3%,rgba(9,11,9,.94) 21%,transparent 58%); content: ''; pointer-events: none; }
+.crew-card { position: relative; isolation: isolate; min-height: 590px; overflow: visible; border: 1px solid #293026; border-radius: 17px; background: linear-gradient(155deg,rgba(184,255,44,.035),transparent 40%),#0b0e0b; }
+.crew-card:hover { z-index: 1; }
+.crew-card::after { position: absolute; inset: 0; border-radius: inherit; background: linear-gradient(0deg,#090b09 3%,rgba(9,11,9,.94) 21%,transparent 58%); content: ''; pointer-events: none; }
 .crew-card img { position: absolute; width: 100%; height: 82%; object-fit: contain; object-position: center top; filter: drop-shadow(0 24px 35px rgba(0,0,0,.35)); transition: transform .35s ease; }.crew-card:hover img { transform: scale(1.025) translateY(-4px); }
 .crew-card > div { position: absolute; z-index: 2; right: 26px; bottom: 25px; left: 26px; }.crew-card span { color: var(--acid); font: 7px var(--font-geist-mono), monospace; letter-spacing: .13em; }.crew-card h3 { margin: 8px 0 0; color: #eef3e9; font-size: 28px; font-weight: 570; letter-spacing: -.04em; }.crew-card p { max-width: 340px; margin: 11px 0 0; color: #818b7d; font-size: 11px; line-height: 1.65; }
 .crew-card-curator { border-color: rgba(184,255,44,.32); box-shadow: inset 0 0 50px rgba(184,255,44,.02); }.crew-card-spirit img { height: 72%; padding: 28px; object-position: center 30%; }
