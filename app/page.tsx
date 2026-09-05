@@ -146,7 +146,7 @@ export default function Home() {
           <h1>Your agents.<br /><em>One deck.</em></h1>
           <p className="crew-lede">A tactile command center for the tasks already running in Codex. See what changed, send the next move, and stay in flow.</p>
           <div className="hero-actions">
-            <a className="button button-primary" href="https://github.com/dion-labs/stream-deck-micro/releases/download/v0.2.0-alpha.1/Codex-Stream-Deck-0.2.0-alpha.1-macOS-arm64.zip" onClick={() => track('native_download', { source: 'hero' })}>Get the macOS app <span>↓</span></a>
+            <a className="button button-primary" href="https://github.com/dion-labs/stream-deck-micro/releases/download/v0.2.0-alpha.2/Codex-Stream-Deck-0.2.0-alpha.2-macOS-arm64.zip" onClick={() => track('native_download', { source: 'hero' })}>Get the macOS app <span>↓</span></a>
             <a className="button button-secondary" href="https://github.com/dion-labs/stream-deck-micro" onClick={() => track('cta_click', { target: 'github_hero' })}>View source <span>↗</span></a>
           </div>
           <div className="hero-proof"><span><i /> 15 programmable keys</span><span><i /> Shared live tasks</span><span><i /> No cloud relay</span></div>
@@ -163,8 +163,8 @@ export default function Home() {
           <h2>A home for<br />your <em>control center.</em></h2>
           <p>One app for your sessions, deck layout, prompts, and device settings. Open it from your Dock and let Micro prepare the local connection.</p>
           <ul><li><b>Your full Control Center.</b> Slots, Sessions, Keys, Library, and Device in one native window.</li><li><b>Ready when you return.</b> Local service at login, compatibility checks, and connection status in the menu bar.</li><li><b>A simpler first run.</b> Node and the Elgato plugin installer are included. No checkout required.</li></ul>
-          <div className="hero-actions"><a className="button button-primary" href="https://github.com/dion-labs/stream-deck-micro/releases/download/v0.2.0-alpha.1/Codex-Stream-Deck-0.2.0-alpha.1-macOS-arm64.zip" onClick={() => track('native_download')}>Download for macOS <span>↓</span></a><a className="button button-secondary" href="/setup/">Setup guide →</a></div>
-          <small>v0.2.0-alpha.1 · Apple Silicon · macOS 14+<br />Unnotarized preview. <a href="https://github.com/dion-labs/stream-deck-micro/releases/tag/v0.2.0-alpha.1">Requirements, installation & release notes ↗</a></small>
+          <div className="hero-actions"><a className="button button-primary" href="https://github.com/dion-labs/stream-deck-micro/releases/download/v0.2.0-alpha.2/Codex-Stream-Deck-0.2.0-alpha.2-macOS-arm64.zip" onClick={() => track('native_download')}>Download for macOS <span>↓</span></a><a className="button button-secondary" href="/setup/">Setup guide →</a></div>
+          <small>v0.2.0-alpha.2 · Apple Silicon · macOS 14+<br />Unnotarized preview. <a href="https://github.com/dion-labs/stream-deck-micro/releases/tag/v0.2.0-alpha.2">Requirements, installation & release notes ↗</a></small>
         </div>
         <figure className="native-release-visual"><div className="native-window-bar"><i /><i /><i /><span>Codex + Stream Deck</span></div><img src="/native-control-center.webp" alt="Micro’s native Control Center showing a 15-key deck, live task states, session controls, and its five workspace tabs" loading="lazy" width="1400" height="1000" /><figcaption>The real Control Center, shown with illustrative demo tasks.</figcaption></figure>
       </section>

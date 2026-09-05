@@ -47,8 +47,8 @@ interface HostedHealth {
 const BRIDGE_ORIGIN = 'http://127.0.0.1:17531';
 const BRIDGE_HEALTH_URL = `${BRIDGE_ORIGIN}/api/hosted/health`;
 const REPOSITORY = 'https://github.com/dion-labs/stream-deck-micro';
-const RELEASE = `${REPOSITORY}/releases/tag/v0.2.0-alpha.1`;
-const DOWNLOAD = `${REPOSITORY}/releases/download/v0.2.0-alpha.1/Codex-Stream-Deck-0.2.0-alpha.1-macOS-arm64.zip`;
+const RELEASE = `${REPOSITORY}/releases/tag/v0.2.0-alpha.2`;
+const DOWNLOAD = `${REPOSITORY}/releases/download/v0.2.0-alpha.2/Codex-Stream-Deck-0.2.0-alpha.2-macOS-arm64.zip`;
 const SHARED_GUIDE = `${REPOSITORY}#shared-control-verified-scoped-launch`;
 
 const componentOrder = ['bridge', 'surface', 'plugin', 'codexDesktop', 'sharedControl', 'bindings'] as const;
