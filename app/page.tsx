@@ -146,7 +146,7 @@ export default function Home() {
           <h1>Your agents.<br /><em>One deck.</em></h1>
           <p className="crew-lede">A tactile command center for the tasks already running in Codex. See what changed, send the next move, and stay in flow.</p>
           <div className="hero-actions">
-            <a className="button button-primary" href="/setup/" onClick={() => track('cta_click', { target: 'setup_hero' })}>Get the macOS app <span>↓</span></a>
+            <a className="button button-primary" href="https://github.com/dion-labs/stream-deck-micro/releases/download/v0.2.0-alpha.1/Codex-Stream-Deck-0.2.0-alpha.1-macOS-arm64.zip" onClick={() => track('native_download', { source: 'hero' })}>Get the macOS app <span>↓</span></a>
             <a className="button button-secondary" href="https://github.com/dion-labs/stream-deck-micro" onClick={() => track('cta_click', { target: 'github_hero' })}>View source <span>↗</span></a>
           </div>
           <div className="hero-proof"><span><i /> 15 programmable keys</span><span><i /> Shared live tasks</span><span><i /> No cloud relay</span></div>

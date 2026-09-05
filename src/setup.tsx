@@ -365,8 +365,9 @@ function Setup() {
 
                 {route === 'native' ? <section className="install-panel native-install">
                   <header><div><small>MACOS NATIVE PREVIEW</small><h3>Codex + Stream Deck</h3></div></header>
+                  <div className="native-download-action"><a className="setup-primary" href={DOWNLOAD} onClick={() => track('native_download', { source: 'wizard' })}>Download for macOS <span>↓</span></a><small>Apple Silicon · macOS 14+ · unnotarized preview</small></div>
                   <ol>
-                    <li><a href={DOWNLOAD}>Download the macOS app ↓</a> and unzip it.</li>
+                    <li>Download the app using the button above and unzip it.</li>
                     <li>Move <b>Codex + Stream Deck.app</b> into Applications before opening it.</li>
                     <li>This preview is not notarized. Read the <a href={RELEASE}>Gatekeeper guidance</a> before approving it in macOS.</li>
                     <li>Open the app and choose <b>Install Elgato Plugin</b>. Accept installation in Elgato and activate the bundled Micro profile.</li>
