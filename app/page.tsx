@@ -138,13 +138,15 @@ export default function Home() {
         </div>
       </nav>
 
+      <a className="native-announcement shell" href="#native-app"><span>NEW · MACOS PREVIEW</span> Your Control Center now lives in the Dock. <b>Meet the native app ↗</b></a>
+
       <section className="crew-hero shell" id="top">
         <div className="crew-hero-copy">
           <p className="eyebrow"><span /> Open source · Local first · Built for Codex</p>
           <h1>Your agents.<br /><em>One deck.</em></h1>
           <p className="crew-lede">A tactile command center for the tasks already running in Codex. See what changed, send the next move, and stay in flow.</p>
           <div className="hero-actions">
-            <a className="button button-primary" href="/setup/" onClick={() => track('cta_click', { target: 'setup_hero' })}>Set up Micro <span>→</span></a>
+            <a className="button button-primary" href="/setup/" onClick={() => track('cta_click', { target: 'setup_hero' })}>Get the macOS app <span>↓</span></a>
             <a className="button button-secondary" href="https://github.com/dion-labs/stream-deck-micro" onClick={() => track('cta_click', { target: 'github_hero' })}>View source <span>↗</span></a>
           </div>
           <div className="hero-proof"><span><i /> 15 programmable keys</span><span><i /> Shared live tasks</span><span><i /> No cloud relay</span></div>
@@ -153,6 +155,18 @@ export default function Home() {
           <img src="/crew/hero.webp" alt="A synthetic curator, human operator, and small console spirit coordinating agent sessions" />
           <div className="crew-caption"><span>THE MICRO CREW</span><b>Operator · Curator · Console Spirit</b></div>
         </div>
+      </section>
+
+      <section className="native-release shell" id="native-app">
+        <div className="native-release-copy">
+          <p className="eyebrow"><span /> Native macOS app · out now</p>
+          <h2>A home for<br />your <em>control center.</em></h2>
+          <p>One app for your sessions, deck layout, prompts, and device settings. Open it from your Dock and let Micro prepare the local connection.</p>
+          <ul><li><b>Your full Control Center.</b> Slots, Sessions, Keys, Library, and Device in one native window.</li><li><b>Ready when you return.</b> Local service at login, compatibility checks, and connection status in the menu bar.</li><li><b>A simpler first run.</b> Node and the Elgato plugin installer are included. No checkout required.</li></ul>
+          <div className="hero-actions"><a className="button button-primary" href="https://github.com/dion-labs/stream-deck-micro/releases/download/v0.2.0-alpha.1/Codex-Stream-Deck-0.2.0-alpha.1-macOS-arm64.zip" onClick={() => track('native_download')}>Download for macOS <span>↓</span></a><a className="button button-secondary" href="/setup/">Setup guide →</a></div>
+          <small>v0.2.0-alpha.1 · Apple Silicon · macOS 14+<br />Unnotarized preview. <a href="https://github.com/dion-labs/stream-deck-micro/releases/tag/v0.2.0-alpha.1">Requirements, installation & release notes ↗</a></small>
+        </div>
+        <figure className="native-release-visual"><div className="native-window-bar"><i /><i /><i /><span>Codex + Stream Deck</span></div><img src="/native-control-center.webp" alt="Micro’s native Control Center showing a 15-key deck, live task states, session controls, and its five workspace tabs" loading="lazy" width="1400" height="1000" /><figcaption>The real Control Center, shown with illustrative demo tasks.</figcaption></figure>
       </section>
 
       <section className="deck-experience shell" id="experience">
@@ -218,7 +232,7 @@ export default function Home() {
       <section className="local-architecture shell"><div><p className="section-index">05 / Local by design</p><p className="section-kicker">Your code. Your machine.<br />Your command center.</p><h2>No cloud<br /><em>control plane.</em></h2><p>The deck and browser talk to a bridge bound to loopback. Dion Labs hosts the showcase and guides—not your prompts, task names, configuration, or session history.</p></div><div className="local-map"><article><span>01</span><strong>Codex tasks</strong><small>live local sessions</small></article><i /><section><article><span>02</span><strong>Codex Desktop</strong><small>read · write</small></article><article><span>03</span><strong>Stream Deck</strong><small>SDK / HID</small></article><article><span>04</span><strong>Control Room</strong><small>127.0.0.1</small></article></section></div></section>
 
       <section className="install-v3 shell" id="install">
-        <div className="install-v3-copy"><p className="section-index">06 / Get started</p><p className="section-kicker">{edition === 'marketplace' ? 'Plugin. Profile. Go.' : 'Clone. Build. Go.'}<br />Keep the authority local.</p><h2>Make it<br /><em>yours.</em></h2><p>{edition === 'marketplace' ? 'Run inside Elgato Stream Deck 7.1+ with an editable 5×3 profile and persistent local bridge.' : 'Run directly on macOS with Node.js 22+, Codex Desktop, and the 15-key Stream Deck MK.2.'}</p><div className="edition-toggle"><button className={edition === 'marketplace' ? 'active' : ''} type="button" onClick={() => { setEdition('marketplace'); track('edition_select', { edition: 'marketplace', source: 'install' }); }}>Marketplace</button><button className={edition === 'independent' ? 'active' : ''} type="button" onClick={() => { setEdition('independent'); track('edition_select', { edition: 'independent', source: 'install' }); }}>Independent</button></div><a href="/setup/">Open guided setup <span>→</span></a></div>
+        <div className="install-v3-copy"><p className="section-index">06 / Build from source</p><p className="section-kicker">{edition === 'marketplace' ? 'Plugin. Profile. Go.' : 'Clone. Build. Go.'}<br />Keep the authority local.</p><h2>Prefer to<br /><em>build?</em></h2><p>{edition === 'marketplace' ? 'Run inside Elgato Stream Deck 7.1+ with an editable 5×3 profile and persistent local bridge.' : 'Run directly on macOS with Node.js 22+, Codex Desktop, and the 15-key Stream Deck MK.2.'}</p><div className="edition-toggle"><button className={edition === 'marketplace' ? 'active' : ''} type="button" onClick={() => { setEdition('marketplace'); track('edition_select', { edition: 'marketplace', source: 'install' }); }}>Marketplace</button><button className={edition === 'independent' ? 'active' : ''} type="button" onClick={() => { setEdition('independent'); track('edition_select', { edition: 'independent', source: 'install' }); }}>Independent</button></div><a href="/setup/">Open guided setup <span>→</span></a></div>
         <div className="terminal" aria-label="Installation commands"><div className="terminal-bar"><span><i /><i /><i /></span><b>TERMINAL · ZSH</b><span>{edition.toUpperCase()}</span></div><div className="terminal-code">{installCommands[edition].map((command, index) => <p key={command}><span>{String(index + 1).padStart(2, '0')}</span><code><b>{command.startsWith('#') ? '#' : '$'}</b> {command.replace(/^#\s*/, '')}</code></p>)}<p className="terminal-result"><span>✓</span><code>{edition === 'marketplace' ? 'Marketplace bridge ready in the background' : 'Control Room ready at 127.0.0.1:17531'}</code></p></div><button onClick={copyInstall} type="button">{copied ? 'Copied ✓' : 'Copy install commands'}</button></div>
       </section>
 

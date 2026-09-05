@@ -47,6 +47,8 @@ interface HostedHealth {
 const BRIDGE_ORIGIN = 'http://127.0.0.1:17531';
 const BRIDGE_HEALTH_URL = `${BRIDGE_ORIGIN}/api/hosted/health`;
 const REPOSITORY = 'https://github.com/dion-labs/stream-deck-micro';
+const RELEASE = `${REPOSITORY}/releases/tag/v0.2.0-alpha.1`;
+const DOWNLOAD = `${REPOSITORY}/releases/download/v0.2.0-alpha.1/Codex-Stream-Deck-0.2.0-alpha.1-macOS-arm64.zip`;
 const SHARED_GUIDE = `${REPOSITORY}#shared-control-verified-scoped-launch`;
 
 const componentOrder = ['bridge', 'surface', 'plugin', 'codexDesktop', 'sharedControl', 'bindings'] as const;
@@ -71,7 +73,7 @@ const editionDetails: Record<Edition, {
     title: 'Marketplace',
     summary: 'The familiar Elgato workflow, with an editable profile and a background local bridge.',
     points: ['Elgato owns the hardware', 'Profile editor stays available', 'Sleep renders Micro keys black'],
-    footnote: 'Requires Stream Deck 7.1+. The public listing is pending review; source installation works today.',
+    footnote: 'Requires Stream Deck 7.1+. The public listing is pending review; the native download includes the plugin installer.',
   },
   independent: {
     eyebrow: 'Direct HID',
@@ -166,19 +168,18 @@ function recoveryCopy(name: ComponentName, component: HealthComponent, edition: 
 
 function Setup() {
   const [step, setStep] = useState<OnboardingStep>(1);
+  const [route, setRoute] = useState<'native' | 'source'>('native');
   const [edition, setEdition] = useState<Edition>('marketplace');
-  const [reviewed, setReviewed] = useState<Set<string>>(() => new Set(
-    /Macintosh|Mac OS X/.test(navigator.userAgent) ? ['macos'] : [],
-  ));
+  const [reviewed, setReviewed] = useState<Set<string>>(() => new Set());
   const [connection, setConnection] = useState<ConnectionState>('idle');
   const [health, setHealth] = useState<HostedHealth | null>(null);
   const [failure, setFailure] = useState<'unreachable' | 'timeout' | 'unsupported'>('unreachable');
   const [copyState, setCopyState] = useState<'idle' | 'copied' | 'failed'>('idle');
 
   const prerequisites = [
-    { id: 'macos', title: 'macOS', detail: 'Stream Deck Micro currently targets macOS.' },
-    { id: 'node', title: 'Node.js 22+', detail: 'Required to build and run the local bridge.' },
-    { id: 'codex', title: 'Codex Desktop', detail: 'Installed, launched, and authenticated.' },
+    { id: 'macos', title: route === 'native' ? 'Apple Silicon · macOS 14+' : 'macOS', detail: route === 'native' ? 'Check your chip and macOS version in About This Mac.' : 'Stream Deck Micro currently targets macOS.' },
+    ...(route === 'source' ? [{ id: 'node', title: 'Node.js 22+', detail: 'Required to build and run the local bridge.' }] : []),
+    { id: 'codex', title: 'ChatGPT Desktop with Codex', detail: 'Installed in Applications, launched, and signed in.' },
     { id: 'deck', title: '15-key Stream Deck MK.2', detail: 'The supported physical device for this release.' },
     edition === 'marketplace'
       ? { id: 'surface', title: 'Stream Deck 7.1+', detail: 'Keep the Elgato app open for the Marketplace edition.' }
@@ -192,6 +193,7 @@ function Setup() {
 
   const chooseEdition = (choice: Edition) => {
     setEdition(choice);
+    if (choice === 'independent') setRoute('source');
     setReviewed((current) => {
       const next = new Set(current);
       next.delete('surface');
@@ -273,7 +275,7 @@ function Setup() {
     <main className="setup-page">
       <nav className="setup-nav shell" aria-label="Setup navigation">
         <a className="brand" href="/" aria-label="Stream Deck Micro home">
-          <span className="brand-mark" aria-hidden="true">DM</span>
+          <span className="brand-mark brand-spirit" aria-hidden="true"><img src="/crew/curator-headshot.webp" alt="" /></span>
           <span>Stream Deck Micro</span>
         </a>
         <div className="setup-nav-meta"><span>Local setup</span><a href="/">Back to project ↗</a></div>
@@ -312,10 +314,15 @@ function Setup() {
             <div className="setup-state setup-state-choose">
               <div className="state-heading">
                 <p className="setup-index">01 / Choose your comfort level</p>
-                <h2>One core.<br />Two surfaces.</h2>
-                <p>Both editions use the same local bridge and Control Room. The difference is who owns the hardware.</p>
+                <h2>Your Mac.<br />Your way in.</h2>
+                <p>Start with the native macOS app, or build from source. Both use the same local Control Center.</p>
               </div>
-              <div className="edition-picker">
+              <div className="installation-route" role="group" aria-label="Installation method">
+                <button type="button" className={route === 'native' ? 'is-selected' : ''} aria-pressed={route === 'native'} onClick={() => { setRoute('native'); setEdition('marketplace'); setReviewed(new Set()); }}><b>Native app · recommended</b><span>Apple Silicon preview. Node and the Elgato plugin installer included.</span></button>
+                <button type="button" className={route === 'source' ? 'is-selected' : ''} aria-pressed={route === 'source'} onClick={() => { setRoute('source'); setReviewed(new Set()); }}><b>Build from source</b><span>For contributors and direct hardware setups.</span></button>
+              </div>
+              {route === 'native' && <p className="native-preview-note">An unnotarized preview for macOS 14+. Review the <a href={RELEASE}>release notes and installation guidance ↗</a>. Uses the Marketplace surface with Elgato Stream Deck.</p>}
+              {route === 'source' && <div className="edition-picker">
                 {(Object.keys(editionDetails) as Edition[]).map((choice) => {
                   const details = editionDetails[choice];
                   return (
@@ -329,9 +336,9 @@ function Setup() {
                     </button>
                   );
                 })}
-              </div>
+              </div>}
               <div className="onboarding-next">
-                <button className="setup-primary" type="button" onClick={() => setStep(2)}>Prepare {editionDetails[edition].title} <span>→</span></button>
+                <button className="setup-primary" type="button" onClick={() => setStep(2)}>Prepare {route === 'native' ? 'native app' : editionDetails[edition].title} <span>→</span></button>
                 <button className="text-action" type="button" onClick={() => setStep(3)}>Already installed? Connect now</button>
               </div>
             </div>
@@ -341,7 +348,7 @@ function Setup() {
             <div className="setup-state setup-state-prepare">
               <div className="state-heading prepare-heading">
                 <div><p className="setup-index">02 / Prepare this Mac</p><h2>Check. Install.<br />Keep it local.</h2></div>
-                <div className="review-progress"><strong>{reviewed.size}/{prerequisites.length}</strong><span>requirements reviewed</span></div>
+                <div className="review-progress"><strong>{prerequisites.filter(item => reviewed.has(item.id)).length}/{prerequisites.length}</strong><span>requirements reviewed</span></div>
               </div>
 
               <div className="prepare-grid">
@@ -356,18 +363,29 @@ function Setup() {
                   </div>
                 </section>
 
-                <section className="install-panel">
+                {route === 'native' ? <section className="install-panel native-install">
+                  <header><div><small>MACOS NATIVE PREVIEW</small><h3>Codex + Stream Deck</h3></div></header>
+                  <ol>
+                    <li><a href={DOWNLOAD}>Download the macOS app ↓</a> and unzip it.</li>
+                    <li>Move <b>Codex + Stream Deck.app</b> into Applications before opening it.</li>
+                    <li>This preview is not notarized. Read the <a href={RELEASE}>Gatekeeper guidance</a> before approving it in macOS.</li>
+                    <li>Open the app and choose <b>Install Elgato Plugin</b>. Accept installation in Elgato and activate the bundled Micro profile.</li>
+                    <li>Choose <b>Set Up Local Bridge</b>. This verifies compatibility and enables the local service and automatic connection at login.</li>
+                    <li>Use this app to open Codex. If Codex is already running privately, keep working; quit it when you are ready, then open this launcher to connect.</li>
+                  </ol>
+                  <p>Already using a source install? The app keeps your existing service and configuration. See the release notes before migrating or replacing an installed copy.</p>
+                </section> : <section className="install-panel">
                   <header><div><small>SOURCE INSTALL</small><h3>{editionDetails[edition].title}</h3></div><button type="button" onClick={copyInstall}>{copyState === 'copied' ? 'Copied ✓' : copyState === 'failed' ? 'Copy failed' : 'Copy commands'}</button></header>
                   <div className="install-lines">
                     {commands.map((command, index) => <p className={command.startsWith('#') ? 'is-comment' : ''} key={`${command}-${index}`}><span>{String(index + 1).padStart(2, '0')}</span><code>{command}</code></p>)}
                   </div>
-                </section>
+                </section>}
               </div>
 
-              <div className="advanced-boundary">
+              {route === 'source' && <div className="advanced-boundary">
                 <div><i /> <span><b>Safe baseline first.</b> These commands install the surface and bridge without enabling shared Codex control.</span></div>
                 <a href={SHARED_GUIDE}>Read the optional live-control guide ↗</a>
-              </div>
+              </div>}
               <div className="onboarding-next">
                 <button className="setup-primary" type="button" onClick={() => setStep(3)} disabled={!requirementsReady}>Continue to connection <span>→</span></button>
                 {!requirementsReady && <small>Review every requirement to continue, or use “Already installed” from step 1.</small>}
@@ -377,7 +395,8 @@ function Setup() {
 
           {step === 3 && connection !== 'checking' && connection !== 'failed' && (
             <div className="setup-state setup-state-connect">
-              <p className="setup-index">03 / Permission and reachability</p>
+              <p className="setup-index">03 / Optional browser health check</p>
+              {route === 'native' && <p>The native app has its own Control Center and connection status. This browser check is optional; you can continue in the app.</p>}
               <h2>Let this page check<br />your local bridge.</h2>
               <p>
                 Your browser may ask whether deck.dionlabs.ai can find devices on your local
@@ -437,7 +456,7 @@ function Setup() {
                 {componentOrder.map((name) => {
                   const component = health.health.components[name];
                   if (!component) return null;
-                  const guidance = recoveryCopy(name, component, installedEdition!);
+                  const guidance = route === 'native' && (name === 'sharedControl' || name === 'codexDesktop') && component.state !== 'ready' && component.state !== 'not-required' ? 'Open Codex + Stream Deck and follow its connection status. An already-running private Codex session stays untouched; quit it when convenient, then open the launcher.' : recoveryCopy(name, component, installedEdition!);
                   return (
                     <article className={`health-card health-${component.state} ${guidance ? 'has-guidance' : ''}`} key={name}>
                       <div><i /><span>{componentLabels[name]}</span>{component.version && <code>v{component.version}</code>}</div>
@@ -455,7 +474,7 @@ function Setup() {
                   <strong>{editionMismatch ? 'Align the selected and running editions.' : health.health.components.bindings?.state === 'action-required' ? 'Assign your first session button.' : health.capabilities.mode === 'navigation-only' ? 'Open the Control Room—or review optional live control.' : 'Your local control path is ready.'}</strong>
                 </div>
                 <div className="setup-actions">
-                  {editionMismatch && <button className="setup-secondary" type="button" onClick={() => { setEdition(installedEdition!); setStep(1); }}>Use detected edition</button>}
+                  {editionMismatch && <button className="setup-secondary" type="button" onClick={() => { setEdition(installedEdition!); if (installedEdition === 'independent') setRoute('source'); setStep(1); }}>Use detected edition</button>}
                   <button className="setup-secondary" type="button" onClick={connect}>Check again</button>
                   <a className="setup-primary" href={BRIDGE_ORIGIN}>Open local Control Room <span>↗</span></a>
                 </div>
@@ -472,7 +491,7 @@ function Setup() {
 
       <section className="setup-notes shell">
         <article><span>01</span><div><h3>Deliberately read-only</h3><p>This flow cannot install software, attach tasks, send prompts, change keys, stop work, or read your configuration.</p></div></article>
-        <article><span>02</span><div><h3>Safe baseline first</h3><p>Installation does not silently turn on experimental shared control or change how Codex Desktop launches.</p></div></article>
+        <article><span>02</span><div><h3>You choose when to connect</h3><p>The native app enables automatic connection when you choose Set Up Local Bridge. Existing Codex sessions are never restarted by setup.</p></div></article>
         <article><span>03</span><div><h3>Local authority</h3><p>The bridge remains the source of truth. This page guides and observes; it is not a cloud control plane.</p></div></article>
       </section>
 
