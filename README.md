@@ -70,3 +70,9 @@ events and action outcomes before adding another analytics destination.
 ## License
 
 MIT
+
+## Missing pages
+
+`public/404.html` is copied to the output root during the build. Cloudflare
+Pages uses it to return HTTP 404 for unknown paths instead of falling back to
+the homepage. Keep this file when changing the build or hosting configuration.
